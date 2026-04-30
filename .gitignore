@@ -1,0 +1,9 @@
+.DS_Store
+build/
+.preview/
+entry/.preview/
+.idea/
+*.iml
+node_modules/
+.hvigor/
+oh_modules/
