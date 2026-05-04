@@ -101,18 +101,18 @@ export struct RegisterPage {
               this.errorMessage = '';
             })
 
-          Button({ type: ButtonType.Circle }) {
-            SymbolGlyph(this.showPassword ? $r('sys.symbol.eye_slash') : $r('sys.symbol.eye'))
-              .fontSize(20)
-              .fontColor([$r('sys.color.icon_secondary')])
-          }
-          .width(40)
-          .height(40)
-          .backgroundColor(Color.Transparent)
-          .margin({ left: -48 })
-          .onClick(() => {
-            this.showPassword = !this.showPassword;
-          })
+          // Button({ type: ButtonType.Circle }) {
+          //   SymbolGlyph(this.showPassword ? $r('sys.symbol.eye_slash') : $r('sys.symbol.eye'))
+          //     .fontSize(20)
+          //     .fontColor([$r('sys.color.icon_secondary')])
+          // }
+          // .width(40)
+          // .height(40)
+          // .backgroundColor(Color.Transparent)
+          // .margin({ left: -48 })
+          // .onClick(() => {
+          //   this.showPassword = !this.showPassword;
+          // })
         }
         .width('100%')
       }
