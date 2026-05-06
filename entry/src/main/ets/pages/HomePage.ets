@@ -104,7 +104,7 @@ export struct HomePage {
             .fontSize(15)
             .fontColor(TEXT_SECONDARY)
 
-          Text(`Hello, ${this.username}! 👋`)
+          Text(`Hello, ${this.username}!`)
             .fontSize(28)
             .fontWeight(FontWeight.Bold)
             .fontColor(TEXT_PRIMARY)
