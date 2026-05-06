@@ -13,7 +13,6 @@ export struct SensorConnectionPage {
   @Local connectionState: SensorConnectionState = { connected: false, deviceId: '', deviceName: '' };
   @Local errorMessage: string = '';
   @Local bleEnabled: boolean = true;
-
   private bleManager: BleSensorManager = BleSensorManager.getInstance();
   private scanInterval: number = -1;
 
@@ -23,8 +22,10 @@ export struct SensorConnectionPage {
 
   aboutToDisappear(): void {
     this.stopScan();
-    this.bleManager.setOnScanResult(() => {});
-    this.bleManager.setOnStateChange(() => {});
+    this.bleManager.setOnScanResult(() => {
+    });
+    this.bleManager.setOnStateChange(() => {
+    });
   }
 
   private initBle(): void {
@@ -79,6 +80,25 @@ export struct SensorConnectionPage {
       clearTimeout(this.scanInterval);
       this.scanInterval = -1;
     }
+    //Test code start
+    this.devices = [
+      { deviceId: "1", deviceName: "1", rssi: 1 },
+      { deviceId: "2", deviceName: "2", rssi: 2 },
+      { deviceId: "3", deviceName: "3", rssi: 3 },
+      { deviceId: "1", deviceName: "1", rssi: 1 },
+      { deviceId: "2", deviceName: "2", rssi: 2 },
+      { deviceId: "3", deviceName: "3", rssi: 3 },
+      { deviceId: "1", deviceName: "1", rssi: 1 },
+      { deviceId: "2", deviceName: "2", rssi: 2 },
+      { deviceId: "3", deviceName: "3", rssi: 3 },
+      { deviceId: "1", deviceName: "1", rssi: 1 },
+      { deviceId: "2", deviceName: "2", rssi: 2 },
+      { deviceId: "3", deviceName: "3", rssi: 3 },
+      { deviceId: "1", deviceName: "1", rssi: 1 },
+      { deviceId: "2", deviceName: "2", rssi: 2 },
+      { deviceId: "3", deviceName: "3", rssi: 3 }
+    ];
+    //Test code end
   }
 
   connectSensor(device: SensorDevice): void {
@@ -112,8 +132,6 @@ export struct SensorConnectionPage {
   build() {
     NavDestination() {
       Column() {
-        this.TitleBar()
-
         if (this.connectionState.connected) {
           this.ConnectedView()
         } else {
@@ -129,25 +147,6 @@ export struct SensorConnectionPage {
       this.onBack();
       return true;
     })
-  }
-
-  @Builder
-  TitleBar() {
-    Row() {
-      Button() {
-        SymbolGlyph($r('sys.symbol.chevron_left'))
-          .fontSize(24)
-      }
-      .type(ButtonType.Circle)
-      .width(40)
-      .height(40)
-      .backgroundColor(Color.Transparent)
-      .onClick(() => this.onBack())
-    }
-    .width('100%')
-    .height(56)
-    .padding({ left: 12 })
-    .alignItems(VerticalAlign.Center)
   }
 
   @Builder
@@ -224,52 +223,57 @@ export struct SensorConnectionPage {
             .fontWeight(FontWeight.Medium)
             .width('100%')
             .padding({ left: 24 })
+          List({ space: 12 }) {
+            ForEach(this.devices, (device: SensorDevice) => {
+              ListItem() {
+                Row() {
+                  Column({ space: 4 }) {
+                    Text(device.deviceName)
+                      .fontSize($r('sys.float.Body_L'))
+                      .fontWeight(FontWeight.Medium)
+                    Text('Signal: ' + device.rssi + ' dBm')
+                      .fontSize($r('sys.float.Caption_M'))
+                      .fontColor($r('sys.color.font_tertiary'))
+                  }
+                  .alignItems(HorizontalAlign.Start)
 
-          ForEach(this.devices, (device: SensorDevice) => {
-            Row() {
-              Column({ space: 4 }) {
-                Text(device.deviceName)
-                  .fontSize($r('sys.float.Body_L'))
-                  .fontWeight(FontWeight.Medium)
-
-                Text('Signal: ' + device.rssi + ' dBm')
-                  .fontSize($r('sys.float.Caption_M'))
-                  .fontColor($r('sys.color.font_tertiary'))
+                  Blank()
+                  if (this.isConnecting) {
+                    LoadingProgress()
+                      .width(24)
+                      .height(24)
+                  } else {
+                    SymbolGlyph($r('sys.symbol.plus_circle'))
+                      .fontSize(24)
+                      .fontColor([$r('sys.color.icon_emphasize')])
+                  }
+                }
+                .width('100%')
+                .padding(16)
+                .backgroundColor($r('sys.color.comp_background_list_card'))
+                .borderRadius(12)
               }
-              .alignItems(HorizontalAlign.Start)
-
-              Blank()
-
-              if (this.isConnecting) {
-                LoadingProgress()
-                  .width(24)
-                  .height(24)
-              } else {
-                SymbolGlyph($r('sys.symbol.plus_circle'))
-                  .fontSize(24)
-                  .fontColor([$r('sys.color.icon_emphasize')])
-              }
-            }
-            .width('100%')
-            .padding(16)
-            .backgroundColor($r('sys.color.comp_background_list_card'))
-            .borderRadius(12)
-            .onClick(() => {
-              if (!this.isConnecting) {
-                this.connectSensor(device);
-              }
+              .onClick(() => {
+                if (!this.isConnecting) {
+                  this.connectSensor(device);
+                }
+              })
             })
-          })
-        }
-        .padding({ left: 24, right: 24 })
-      }
-
-      if (this.errorMessage) {
-        Text(this.errorMessage)
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor(Color.Red)
-          .textAlign(TextAlign.Center)
+          }
+          .width('100%')
           .padding({ left: 24, right: 24 })
+          .layoutWeight(1) // 修改②：占据剩余空间，超出部分自动滚动
+          .edgeEffect(EdgeEffect.Spring) // 弹性边缘效果
+          .scrollBar(BarState.Auto)
+        }
+
+        if (this.errorMessage) {
+          Text(this.errorMessage)
+            .fontSize($r('sys.float.Body_M'))
+            .fontColor(Color.Red)
+            .textAlign(TextAlign.Center)
+            .padding({ left: 24, right: 24 })
+        }
       }
     }
     .width('100%')

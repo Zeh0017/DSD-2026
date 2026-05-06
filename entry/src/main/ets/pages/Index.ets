@@ -12,11 +12,12 @@ import { SessionSetupPage } from './rehabilitation/SessionSetupPage';
 import { SessionActivePage } from './rehabilitation/SessionActivePage';
 import { SessionResultPage } from './rehabilitation/SessionResultPage';
 import { RegisterPage } from './RegisterPage';
+import { promptAction } from '@kit.ArkUI';
 
 @Entry
 @ComponentV2
 struct Index {
-  @Local currentIndex: number = 0;
+  @Local currentIndex: number = 3;
   @Local isLoggedIn: boolean = false;
   private navStack: NavPathStack = new NavPathStack();
 
@@ -30,40 +31,41 @@ struct Index {
     Navigation(this.navStack) {
       Tabs({ barPosition: BarPosition.End, index: this.currentIndex }) {
         TabContent() {
-          HomePage()
+              HomePage();
         }
         .tabBar(this.TabBuilder(0))
 
         TabContent() {
-          TestPage()
+            TestPage();
         }
         .tabBar(this.TabBuilder(1))
 
         TabContent() {
-          RecordPage()
+            RecordPage();
         }
         .tabBar(this.TabBuilder(2))
 
         TabContent() {
-          ProfilePage()
+            ProfilePage();
         }
         .tabBar(this.TabBuilder(3))
       }
       .barHeight(56)
       .barMode(BarMode.Fixed)
       .scrollable(false)
-      .onChange((index: number) => {
-        const loggedIn: boolean = AppStorage.get<boolean>('isLoggedIn') ?? false;
-        if (!loggedIn && index !== 3) {
-          // Not logged in and not on account tab, redirect back
-          this.currentIndex = 3;
-          return;
-        }
-        this.currentIndex = index;
-      })
+      .animationDuration(300)
+      // .onChange((index: number) => {
+      //   const loggedIn: boolean = AppStorage.get<boolean>('isLoggedIn') ?? false;
+      //   this.currentIndex = index;
+      //   if (!loggedIn && index !== 3) {
+      //     // Not logged in and not on account tab, redirect back
+      //     this.currentIndex = 3;
+      //   }
+      // })
       .width('100%')
       .height('100%')
       .backgroundColor($r('sys.color.background_secondary'))
+
     }
     .mode(NavigationMode.Stack)
     .hideTitleBar(true)
@@ -105,5 +107,16 @@ struct Index {
     .height('100%')
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
+    .onClick(() => {
+      const loggedIn = AppStorage.get<boolean>('isLoggedIn') ?? false;
+      if (!loggedIn && index !== 3) {
+        promptAction.showToast({
+          message: 'Please log in first!',
+          duration: 2000
+        });
+        return;
+      }
+      this.currentIndex = index;
+    })
   }
 }

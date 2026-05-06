@@ -121,10 +121,9 @@ export struct SessionResultPage {
           .padding({ left: 24, right: 24, top: 24, bottom: 100 })
         }
         .width('100%')
-        .height('100%')
+        .height('90%')
         .scrollBar(BarState.Off)
 
-        Column() {
           Button('Done')
             .width('90%')
             .height(56)
@@ -134,10 +133,7 @@ export struct SessionResultPage {
             .fontSize($r('sys.float.Subtitle_M'))
             .fontWeight(FontWeight.Medium)
             .onClick(() => this.onDone())
-        }
-        .width('100%')
-        .padding({ bottom: 24 })
-        .backgroundColor($r('sys.color.background_primary'))
+            .margin({ bottom: 10 })
       }
       .width('100%')
       .height('100%')

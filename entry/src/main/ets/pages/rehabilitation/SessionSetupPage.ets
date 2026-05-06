@@ -141,8 +141,6 @@ export struct SessionSetupPage {
   build() {
     NavDestination() {
       Column() {
-        this.TitleBar()
-
         if (this.isLoading) {
           this.LoadingView()
         } else if (!this.isSensorConnected) {
@@ -160,25 +158,6 @@ export struct SessionSetupPage {
       this.onBack();
       return true;
     })
-  }
-
-  @Builder
-  TitleBar() {
-    Row() {
-      Button() {
-        SymbolGlyph($r('sys.symbol.chevron_left'))
-          .fontSize(24)
-      }
-      .type(ButtonType.Circle)
-      .width(40)
-      .height(40)
-      .backgroundColor(Color.Transparent)
-      .onClick(() => this.onBack())
-    }
-    .width('100%')
-    .height(56)
-    .padding({ left: 12 })
-    .alignItems(VerticalAlign.Center)
   }
 
   @Builder
@@ -264,6 +243,7 @@ export struct SessionSetupPage {
         })
       }
       .width('100%')
+      .height('100%')
       .layoutWeight(1)
       .padding({ left: 24, right: 24 })
 
@@ -277,7 +257,7 @@ export struct SessionSetupPage {
         .fontWeight(FontWeight.Medium)
         .enabled(this.selectedExerciseId.length > 0 && !this.isLoading)
         .onClick(() => this.onStartSession())
-        .margin({ bottom: 24 })
+        .margin({ bottom: 10 })
     }
     .width('100%')
   }
