@@ -15,15 +15,20 @@ import { RegisterPage } from './RegisterPage';
 import { promptAction } from '@kit.ArkUI';
 
 @Entry
-@ComponentV2
+@Component
 struct Index {
-  @Local currentIndex: number = 3;
-  @Local isLoggedIn: boolean = false;
+  @State currentIndex: number = 3;
+  @StorageLink('isLoggedIn') @Watch('onLoginStateChange') isLoggedIn: boolean = false;
   private navStack: NavPathStack = new NavPathStack();
+
+  onLoginStateChange(propName: string): void {
+    if (!this.isLoggedIn) {
+      this.currentIndex = 3;
+    }
+  }
 
   aboutToAppear(): void {
     AppStorage.setOrCreate<NavPathStack>('navPathStack', this.navStack);
-    // Monitor login state change
     AppStorage.setOrCreate<boolean>('isLoggedIn', false);
   }
 
@@ -50,18 +55,10 @@ struct Index {
         }
         .tabBar(this.TabBuilder(3))
       }
-      .barHeight(56)
+      .barHeight(this.isLoggedIn ? 56 : 0)
       .barMode(BarMode.Fixed)
       .scrollable(false)
       .animationDuration(300)
-      // .onChange((index: number) => {
-      //   const loggedIn: boolean = AppStorage.get<boolean>('isLoggedIn') ?? false;
-      //   this.currentIndex = index;
-      //   if (!loggedIn && index !== 3) {
-      //     // Not logged in and not on account tab, redirect back
-      //     this.currentIndex = 3;
-      //   }
-      // })
       .width('100%')
       .height('100%')
       .backgroundColor($r('sys.color.background_secondary'))
