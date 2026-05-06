@@ -4,6 +4,13 @@
 import { LocalStorageService } from '../service/LocalStorageService';
 import { SessionData } from '../service/RehabilitationService';
 
+const BLUE: string = '#3A5BDB';
+const BG: string = '#EEF1FB';
+const TEXT_PRIMARY: string = '#1A1A2E';
+const TEXT_SECONDARY: string = '#8A8FA8';
+const CARD_BG: string = '#FFFFFF';
+const ICON_BG: string = '#E8EDFF';
+
 @ComponentV2
 export struct HomePage {
   @Local username: string = '';
@@ -51,52 +58,99 @@ export struct HomePage {
 
   build() {
     Scroll() {
-      Column({ space: 24 }) {
-        // Welcome area
-        Column({ space: 8 }) {
-          Text('Welcome back,')
-            .fontSize($r('sys.float.Body_L'))
-            .fontColor($r('sys.color.font_secondary'))
+      Column({ space: 22 }) {
 
-          Text(this.username)
-            .fontSize($r('sys.float.Title_L'))
+        // ── Header ──────────────────────────────────────────────
+        Row() {
+          // Logo
+          Row({ space: 10 }) {
+            Stack({ alignContent: Alignment.Center }) {
+              Circle({ width: 46, height: 46 })
+                .fill(BLUE)
+              SymbolGlyph($r('sys.symbol.person'))
+                .fontSize(22)
+                .fontColor([Color.White])
+            }
+
+            Column({ space: 1 }) {
+              Text('LIMBS')
+                .fontSize(17)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(TEXT_PRIMARY)
+              Text('Motion')
+                .fontSize(12)
+                .fontColor(TEXT_SECONDARY)
+            }
+            .alignItems(HorizontalAlign.Start)
+          }
+
+          Blank()
+
+          // Notification bell
+          Stack({ alignContent: Alignment.Center }) {
+            Circle({ width: 42, height: 42 })
+              .fill(CARD_BG)
+            SymbolGlyph($r('sys.symbol.bell'))
+              .fontSize(20)
+              .fontColor([TEXT_PRIMARY])
+          }
+        }
+        .width('100%')
+        .padding({ top: 20 })
+
+        // ── Welcome ─────────────────────────────────────────────
+        Column({ space: 5 }) {
+          Text('Welcome back,')
+            .fontSize(15)
+            .fontColor(TEXT_SECONDARY)
+
+          Text(`Hello, ${this.username}! 👋`)
+            .fontSize(28)
             .fontWeight(FontWeight.Bold)
-            .fontColor($r('sys.color.font_primary'))
+            .fontColor(TEXT_PRIMARY)
+
+          Text("Keep going, you're making progress.")
+            .fontSize(14)
+            .fontColor(TEXT_SECONDARY)
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
-        .margin({ top: 24 })
 
-        // Quick start training card
-        Column({ space: 16 }) {
-          Row({ space: 12 }) {
+        // ── Start Training card ──────────────────────────────────
+        Row({ space: 16 }) {
+          Stack({ alignContent: Alignment.Center }) {
+            Circle({ width: 52, height: 52 })
+              .fill(ICON_BG)
             SymbolGlyph($r('sys.symbol.heart_circle_fill'))
-              .fontSize(32)
-              .fontColor([$r('sys.color.icon_emphasize')])
-
-            Column({ space: 4 }) {
-              Text('Start Training')
-                .fontSize($r('sys.float.Subtitle_L'))
-                .fontWeight(FontWeight.Medium)
-                .fontColor($r('sys.color.font_primary'))
-
-              Text('Begin a new rehabilitation session')
-                .fontSize($r('sys.float.Caption_M'))
-                .fontColor($r('sys.color.font_secondary'))
-            }
-            .alignItems(HorizontalAlign.Start)
-            .layoutWeight(1)
-
-            SymbolGlyph($r('sys.symbol.chevron_right'))
-              .fontSize(20)
-              .fontColor([$r('sys.color.icon_tertiary')])
+              .fontSize(26)
+              .fontColor([BLUE])
           }
-          .width('100%')
+
+          Column({ space: 5 }) {
+            Text('Start Training')
+              .fontSize(17)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(TEXT_PRIMARY)
+            Text('Begin a new rehabilitation session')
+              .fontSize(13)
+              .fontColor(TEXT_SECONDARY)
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+
+          Stack({ alignContent: Alignment.Center }) {
+            Circle({ width: 36, height: 36 })
+              .fill(ICON_BG)
+            SymbolGlyph($r('sys.symbol.chevron_right'))
+              .fontSize(16)
+              .fontColor([BLUE])
+          }
         }
         .width('100%')
         .padding(20)
-        .borderRadius(16)
-        .backgroundColor($r('sys.color.comp_background_list_card'))
+        .borderRadius(20)
+        .backgroundColor(CARD_BG)
+        .shadow({ radius: 12, color: 'rgba(58,91,219,0.08)', offsetX: 0, offsetY: 4 })
         .onClick(() => {
           const nav = AppStorage.get<NavPathStack>('navPathStack');
           if (nav) {
@@ -104,50 +158,115 @@ export struct HomePage {
           }
         })
 
-        // Latest session summary
+        // ── Stats row ────────────────────────────────────────────
+        Row({ space: 12 }) {
+          // Sessions Today
+          Column({ space: 10 }) {
+            Text('Sessions Today')
+              .fontSize(13)
+              .fontColor(TEXT_SECONDARY)
+
+            Text('3/4')
+              .fontSize(32)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(TEXT_PRIMARY)
+
+            Stack({ alignContent: Alignment.Start }) {
+              Row()
+                .width('100%')
+                .height(4)
+                .backgroundColor('#E4E8F0')
+                .borderRadius(2)
+              Row()
+                .width('75%')
+                .height(4)
+                .backgroundColor(BLUE)
+                .borderRadius(2)
+            }
+            .width('100%')
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+          .padding({ left: 18, right: 18, top: 18, bottom: 18 })
+          .borderRadius(20)
+          .backgroundColor(CARD_BG)
+          .shadow({ radius: 12, color: 'rgba(58,91,219,0.08)', offsetX: 0, offsetY: 4 })
+
+          // Daily Goal
+          Column({ space: 10 }) {
+            Text('Daily Goal')
+              .fontSize(13)
+              .fontColor('rgba(255,255,255,0.75)')
+
+            Text('75%')
+              .fontSize(32)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(Color.White)
+
+            Stack({ alignContent: Alignment.Start }) {
+              Row()
+                .width('100%')
+                .height(4)
+                .backgroundColor('rgba(255,255,255,0.25)')
+                .borderRadius(2)
+              Row()
+                .width('75%')
+                .height(4)
+                .backgroundColor(Color.White)
+                .borderRadius(2)
+            }
+            .width('100%')
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+          .padding({ left: 18, right: 18, top: 18, bottom: 18 })
+          .borderRadius(20)
+          .backgroundColor(BLUE)
+          .shadow({ radius: 12, color: 'rgba(58,91,219,0.2)', offsetX: 0, offsetY: 4 })
+        }
+        .width('100%')
+
+        // ── Latest Session or Appointment ────────────────────────
         if (this.hasSession && this.latestSession) {
-          Column({ space: 12 }) {
+          Column({ space: 14 }) {
             Text('Latest Session')
-              .fontSize($r('sys.float.Subtitle_M'))
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.font_primary'))
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(TEXT_PRIMARY)
               .width('100%')
 
             Row() {
               Column({ space: 4 }) {
                 Text(this.getExerciseName(this.latestSession.exerciseId))
-                  .fontSize($r('sys.float.Body_L'))
+                  .fontSize(15)
                   .fontWeight(FontWeight.Medium)
-                  .fontColor($r('sys.color.font_primary'))
-
+                  .fontColor(TEXT_PRIMARY)
                 Text(this.formatDate(this.latestSession.startTime))
-                  .fontSize($r('sys.float.Caption_M'))
-                  .fontColor($r('sys.color.font_tertiary'))
+                  .fontSize(12)
+                  .fontColor(TEXT_SECONDARY)
               }
               .alignItems(HorizontalAlign.Start)
               .layoutWeight(1)
 
               Column({ space: 4 }) {
                 Text((this.latestSession.averageScore ?? 0).toFixed(0))
-                  .fontSize($r('sys.float.Title_M'))
+                  .fontSize(22)
                   .fontWeight(FontWeight.Bold)
-                  .fontColor($r('sys.color.font_primary'))
-
+                  .fontColor(TEXT_PRIMARY)
                 Text('Score')
-                  .fontSize($r('sys.float.Caption_M'))
-                  .fontColor($r('sys.color.font_tertiary'))
+                  .fontSize(12)
+                  .fontColor(TEXT_SECONDARY)
               }
               .alignItems(HorizontalAlign.Center)
 
               Column({ space: 4 }) {
                 Text(this.formatDuration(this.latestSession.duration ?? 0))
-                  .fontSize($r('sys.float.Title_M'))
+                  .fontSize(22)
                   .fontWeight(FontWeight.Bold)
-                  .fontColor($r('sys.color.font_primary'))
-
+                  .fontColor(TEXT_PRIMARY)
                 Text('Duration')
-                  .fontSize($r('sys.float.Caption_M'))
-                  .fontColor($r('sys.color.font_tertiary'))
+                  .fontSize(12)
+                  .fontColor(TEXT_SECONDARY)
               }
               .alignItems(HorizontalAlign.Center)
               .margin({ left: 16 })
@@ -156,35 +275,80 @@ export struct HomePage {
           }
           .width('100%')
           .padding(20)
-          .borderRadius(16)
-          .backgroundColor($r('sys.color.comp_background_list_card'))
+          .borderRadius(20)
+          .backgroundColor(CARD_BG)
+          .shadow({ radius: 12, color: 'rgba(58,91,219,0.08)', offsetX: 0, offsetY: 4 })
+
         } else {
-          // No session yet
-          Column({ space: 8 }) {
-            SymbolGlyph($r('sys.symbol.list_bullet'))
-              .fontSize(32)
-              .fontColor([$r('sys.color.icon_tertiary')])
+          // Next Appointment placeholder
+          Column({ space: 14 }) {
+            Text('Next Appointment')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(TEXT_PRIMARY)
+              .width('100%')
 
-            Text('No training sessions yet')
-              .fontSize($r('sys.float.Body_M'))
-              .fontColor($r('sys.color.font_tertiary'))
+            Row({ space: 14 }) {
+              Column({ space: 2 }) {
+                SymbolGlyph($r('sys.symbol.calendar'))
+                  .fontSize(18)
+                  .fontColor([BLUE])
+                Text('25')
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(TEXT_PRIMARY)
+                Text('Apr')
+                  .fontSize(11)
+                  .fontColor(TEXT_SECONDARY)
+              }
+              .width(56)
+              .height(56)
+              .borderRadius(14)
+              .backgroundColor(ICON_BG)
+              .justifyContent(FlexAlign.Center)
+              .alignItems(HorizontalAlign.Center)
 
-            Text('Start your first session to see results here')
-              .fontSize($r('sys.float.Caption_M'))
-              .fontColor($r('sys.color.font_tertiary'))
+              Column({ space: 5 }) {
+                Text('Dr. Ana Rodrigues')
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(TEXT_PRIMARY)
+                Row({ space: 4 }) {
+                  Text('10:30')
+                    .fontSize(13)
+                    .fontColor(TEXT_SECONDARY)
+                  Text('•')
+                    .fontSize(13)
+                    .fontColor(TEXT_SECONDARY)
+                  Text('In Clinic')
+                    .fontSize(13)
+                    .fontColor(BLUE)
+                    .fontWeight(FontWeight.Medium)
+                }
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+
+              Text('View >')
+                .fontSize(14)
+                .fontColor(BLUE)
+                .fontWeight(FontWeight.Medium)
+            }
+            .width('100%')
           }
           .width('100%')
-          .padding(32)
-          .borderRadius(16)
-          .backgroundColor($r('sys.color.comp_background_list_card'))
-          .alignItems(HorizontalAlign.Center)
+          .padding(20)
+          .borderRadius(20)
+          .backgroundColor(CARD_BG)
+          .shadow({ radius: 12, color: 'rgba(58,91,219,0.08)', offsetX: 0, offsetY: 4 })
         }
+
       }
       .width('100%')
-      .padding({ left: 24, right: 24 })
+      .padding({ left: 24, right: 24, bottom: 36 })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor($r('sys.color.background_primary'))
+    .backgroundColor(BG)
   }
 }
