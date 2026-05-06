@@ -2,6 +2,7 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { RehabilitationService } from '../service/RehabilitationService';
 import { Logger } from '../service/FileLoggerService';
+import { AuthService } from '../service/AuthService';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -29,12 +30,16 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     Logger.info('EntryAbility', 'onWindowStageCreate');
 
-    windowStage.loadContent('pages/Index', (err) => {
-      if (err.code) {
-        Logger.error('EntryAbility', 'Failed to load content: ' + JSON.stringify(err));
-        return;
-      }
-      Logger.info('EntryAbility', 'Content loaded successfully');
+    // Restore persisted session BEFORE loading the UI so Index.ets receives
+    // the correct isLoggedIn value on its very first render.
+    AuthService.getInstance().init(this.context).then(() => {
+      windowStage.loadContent('pages/Index', (err) => {
+        if (err.code) {
+          Logger.error('EntryAbility', 'Failed to load content: ' + JSON.stringify(err));
+          return;
+        }
+        Logger.info('EntryAbility', 'Content loaded successfully');
+      });
     });
   }
 

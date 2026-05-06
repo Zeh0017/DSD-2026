@@ -29,7 +29,8 @@ struct Index {
 
   aboutToAppear(): void {
     AppStorage.setOrCreate<NavPathStack>('navPathStack', this.navStack);
-    AppStorage.setOrCreate<boolean>('isLoggedIn', false);
+    // isLoggedIn is already set by AuthService.init() in EntryAbility
+    // before this page loads — do not override it here.
   }
 
   build() {

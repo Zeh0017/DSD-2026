@@ -1,6 +1,8 @@
 /**
  * Profile page - Login functionality
  */
+import { AuthService } from '../service/AuthService';
+
 @ComponentV2
 export struct ProfilePage {
   @Local isLoggedIn: boolean = false;
@@ -215,6 +217,8 @@ export struct ProfilePage {
         AppStorage.setOrCreate<boolean>('isLoggedIn', true);
         AppStorage.setOrCreate<string>('registeredUser', this.username);
         this.errorMessage = '';
+        // Persist to disk so session survives app restarts
+        AuthService.getInstance().saveSession(this.username);
       } else {
         this.errorMessage = 'Username needs 3+ chars, Password needs 6+ chars';
       }
@@ -230,5 +234,7 @@ export struct ProfilePage {
     this.username = '';
     this.password = '';
     this.errorMessage = '';
+    // Erase from disk so next app launch starts unauthenticated
+    AuthService.getInstance().clearSession();
   }
 }
