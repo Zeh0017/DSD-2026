@@ -18,7 +18,7 @@ export class TabItem {
  */
 export const TAB_ITEMS: TabItem[] = [
   new TabItem($r('sys.symbol.house_fill'), 'main', 0),
-  new TabItem($r('sys.symbol.plus_circle'), 'test', 1),
-  new TabItem($r('sys.symbol.doc'), 'record', 2),
+  new TabItem($r('sys.symbol.dumbbell'), 'exercises', 1),
+  new TabItem($r('sys.symbol.arrow_up_circle_fill'), 'progress', 2),
   new TabItem($r('sys.symbol.person'), 'account', 3),
 ];

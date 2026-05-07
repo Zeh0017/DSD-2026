@@ -4,6 +4,7 @@
  */
 import { promptAction } from '@kit.ArkUI';
 import { SessionData } from '../../service/RehabilitationService';
+import { LIMBS_TEAL } from '../../designtoken/Color';
 
 interface ScoreGrade {
   grade: string;
@@ -128,7 +129,7 @@ export struct SessionResultPage {
             .width('90%')
             .height(56)
             .borderRadius(28)
-            .backgroundColor($r('sys.color.icon_emphasize'))
+            .backgroundColor(LIMBS_TEAL)
             .fontColor(Color.White)
             .fontSize($r('sys.float.Subtitle_M'))
             .fontWeight(FontWeight.Medium)
@@ -249,7 +250,7 @@ export struct SessionResultPage {
     Column({ space: 8 }) {
       SymbolGlyph(icon)
         .fontSize(24)
-        .fontColor([$r('sys.color.icon_emphasize')])
+        .fontColor([LIMBS_TEAL])
 
       Text(value)
         .fontSize($r('sys.float.Subtitle_M'))

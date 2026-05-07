@@ -5,6 +5,7 @@
 import { promptAction } from '@kit.ArkUI';
 import { RehabilitationService, ExercisePlan, SessionState, SessionData, SessionCallback } from '../../service/RehabilitationService';
 import { Logger } from '../../service/FileLoggerService';
+import { LIMBS_TEAL } from '../../designtoken/Color';
 
 const TAG = 'SessionSetup';
 
@@ -28,6 +29,13 @@ export struct SessionSetupPage {
   aboutToDisappear(): void {
     Logger.debug(TAG, 'aboutToDisappear called');
     this.rehabService.offSessionStateChange(() => {});
+  }
+
+  private getExerciseImage(exerciseId: string): Resource {
+    if (exerciseId === 'ex_001') return $r('app.media.knee_flexion');
+    if (exerciseId === 'ex_002') return $r('app.media.hip_extension');
+    if (exerciseId === 'ex_003') return $r('app.media.ankle_rotation');
+    return $r('app.media.leg_raise');
   }
 
   private checkSensorConnection(): void {
@@ -198,7 +206,7 @@ export struct SessionSetupPage {
         .width('80%')
         .height(48)
         .borderRadius(24)
-        .backgroundColor($r('sys.color.icon_emphasize'))
+        .backgroundColor(LIMBS_TEAL)
         .fontColor(Color.White)
         .onClick(() => this.onConnectSensor())
     }
@@ -251,7 +259,7 @@ export struct SessionSetupPage {
         .width('90%')
         .height(56)
         .borderRadius(28)
-        .backgroundColor(this.selectedExerciseId.length > 0 ? $r('sys.color.icon_emphasize') : $r('sys.color.font_tertiary'))
+        .backgroundColor(this.selectedExerciseId.length > 0 ? LIMBS_TEAL : $r('sys.color.font_tertiary'))
         .fontColor(Color.White)
         .fontSize($r('sys.float.Subtitle_M'))
         .fontWeight(FontWeight.Medium)
@@ -264,61 +272,57 @@ export struct SessionSetupPage {
 
   @Builder
   ExerciseCard(exercise: ExercisePlan) {
-    Column({ space: 12 }) {
-      Row() {
-        Column({ space: 4 }) {
-          Text(exercise.exerciseName)
-            .fontSize($r('sys.float.Body_L'))
-            .fontWeight(FontWeight.Medium)
-
-          Text(exercise.description)
-            .fontSize($r('sys.float.Body_S'))
-            .fontColor($r('sys.color.font_secondary'))
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-        }
-        .alignItems(HorizontalAlign.Start)
-        .layoutWeight(1)
-
-        if (this.selectedExerciseId === exercise.exerciseId) {
-          SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
-            .fontSize(24)
-            .fontColor([$r('sys.color.icon_emphasize')])
-        }
+    Row({ space: 14 }) {
+      // Exercise image — zoomed 20% to clip white border and watermark
+      Stack() {
+        Image(this.getExerciseImage(exercise.exerciseId))
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Cover)
+          .scale({ x: 1.2, y: 1.2 })
       }
+      .width(80)
+      .height(80)
+      .borderRadius(12)
+      .clip(true)
 
-      Row({ space: 16 }) {
+      // Info
+      Column({ space: 6 }) {
+        Text(exercise.exerciseName)
+          .fontSize($r('sys.float.Body_L'))
+          .fontWeight(FontWeight.Medium)
+
+        Text(exercise.description)
+          .fontSize($r('sys.float.Body_S'))
+          .fontColor($r('sys.color.font_secondary'))
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+
         Row({ space: 4 }) {
           SymbolGlyph($r('sys.symbol.clock'))
-            .fontSize(14)
+            .fontSize(13)
             .fontColor([$r('sys.color.font_tertiary')])
           Text(exercise.durationMinutes + ' min')
             .fontSize($r('sys.float.Caption_M'))
             .fontColor($r('sys.color.font_tertiary'))
         }
+      }
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
 
-        if (exercise.targetJointAngles) {
-          Row({ space: 4 }) {
-            SymbolGlyph($r('sys.symbol.person'))
-              .fontSize(14)
-              .fontColor([$r('sys.color.font_tertiary')])
-            Text('With guidance')
-              .fontSize($r('sys.float.Caption_M'))
-              .fontColor($r('sys.color.font_tertiary'))
-          }
-        }
+      if (this.selectedExerciseId === exercise.exerciseId) {
+        SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
+          .fontSize(24)
+          .fontColor([LIMBS_TEAL])
       }
     }
     .width('100%')
     .padding(16)
-    .backgroundColor(
-      this.selectedExerciseId === exercise.exerciseId
-        ? $r('sys.color.comp_background_list_card')
-        : $r('sys.color.comp_background_list_card')
-    )
+    .alignItems(VerticalAlign.Center)
+    .backgroundColor($r('sys.color.comp_background_list_card'))
     .borderRadius(16)
     .borderWidth(this.selectedExerciseId === exercise.exerciseId ? 2 : 0)
-    .borderColor(this.selectedExerciseId === exercise.exerciseId ? $r('sys.color.icon_emphasize') : Color.Transparent)
+    .borderColor(this.selectedExerciseId === exercise.exerciseId ? LIMBS_TEAL : Color.Transparent)
     .onClick(() => {
       this.selectedExerciseId = exercise.exerciseId;
       this.errorMessage = '';

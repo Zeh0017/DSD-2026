@@ -1,240 +1,222 @@
-/**
- * Profile page - Login functionality
- */
 import { AuthService } from '../service/AuthService';
+import { LIMBS_TEAL } from '../designtoken/Color';
 
 @ComponentV2
 export struct ProfilePage {
-  @Local isLoggedIn: boolean = false;
-  @Local username: string = '';
-  @Local password: string = '';
-  @Local showPassword: boolean = false;
-  @Local isLoading: boolean = false;
-  @Local errorMessage: string = '';
+  @Local userName: string = '';
+  @Local userEmail: string = '';
+  @Local userAge: number = 0;
 
   aboutToAppear(): void {
-    this.isLoggedIn = AppStorage.get<boolean>('isLoggedIn') ?? false;
-    if (this.isLoggedIn) {
-      this.username = AppStorage.get<string>('registeredUser') ?? '';
+    this.userName = AppStorage.get<string>('userName') ?? '';
+    this.userEmail = AppStorage.get<string>('userEmail') ?? '';
+    this.userAge = AppStorage.get<number>('userAge') ?? 0;
+  }
+
+  private getInitials(): string {
+    const parts: string[] = this.userName.trim().split(' ').filter((p: string) => p.length > 0);
+    if (parts.length >= 2) {
+      return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
     }
+    if (this.userName.length >= 2) {
+      return this.userName.substring(0, 2).toUpperCase();
+    }
+    return this.userName.toUpperCase();
   }
 
   build() {
     Column() {
-      // Title
-      Text('Account')
-        .fontSize($r('sys.float.Title_M'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
-        .margin({ top: 60, bottom: 32 })
+      // Header
+      Row({ space: 16 }) {
+        // Avatar with initials
+        Stack() {
+          Circle()
+            .width(60)
+            .height(60)
+            .fill(LIMBS_TEAL)
 
-      if (this.isLoggedIn) {
-        // Logged in state
-        this.LoggedInView()
-      } else {
-        // Login form
-        this.LoginForm()
+          Text(this.getInitials())
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(Color.White)
+        }
+
+        // User info
+        Column({ space: 4 }) {
+          Text(this.userName)
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .fontColor('#1A1A1A')
+
+          Text(this.userEmail)
+            .fontSize(13)
+            .fontColor('#8A8A8A')
+
+          if (this.userAge > 0) {
+            Text(`Age: ${this.userAge} years`)
+              .fontSize(13)
+              .fontColor('#8A8A8A')
+          }
+        }
+        .alignItems(HorizontalAlign.Start)
+        .layoutWeight(1)
       }
+      .width('100%')
+      .alignItems(VerticalAlign.Center)
+      .padding({ top: 56, bottom: 24, left: 20, right: 20 })
+      .backgroundColor(Color.White)
+
+      // Menu items
+      Scroll() {
+        Column({ space: 16 }) {
+          // Menu card
+          Column() {
+            // My Recovery
+            // TODO: Navigate to My Recovery page (session history, progress charts)
+            Row() {
+              SymbolGlyph($r('sys.symbol.heart'))
+                .fontSize(20)
+                .fontColor(['#555555'])
+                .margin({ right: 16 })
+              Text('My Recovery')
+                .fontSize(16)
+                .fontColor('#1A1A1A')
+                .layoutWeight(1)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(14)
+                .fontColor(['#C0C0C0'])
+            }
+            .width('100%')
+            .height(56)
+            .padding({ left: 20, right: 20 })
+
+            Divider().strokeWidth(0.5).color('#F0F0F0').margin({ left: 56 })
+
+            // Appointments
+            // TODO: Navigate to Appointments page (scheduled sessions with clinician)
+            Row() {
+              SymbolGlyph($r('sys.symbol.calendar'))
+                .fontSize(20)
+                .fontColor(['#555555'])
+                .margin({ right: 16 })
+              Text('Appointments')
+                .fontSize(16)
+                .fontColor('#1A1A1A')
+                .layoutWeight(1)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(14)
+                .fontColor(['#C0C0C0'])
+            }
+            .width('100%')
+            .height(56)
+            .padding({ left: 20, right: 20 })
+
+            Divider().strokeWidth(0.5).color('#F0F0F0').margin({ left: 56 })
+
+            // Medications
+            // TODO: Navigate to Medications page (prescribed medications list)
+            Row() {
+              SymbolGlyph($r('sys.symbol.cross_case'))
+                .fontSize(20)
+                .fontColor(['#555555'])
+                .margin({ right: 16 })
+              Text('Medications')
+                .fontSize(16)
+                .fontColor('#1A1A1A')
+                .layoutWeight(1)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(14)
+                .fontColor(['#C0C0C0'])
+            }
+            .width('100%')
+            .height(56)
+            .padding({ left: 20, right: 20 })
+
+            Divider().strokeWidth(0.5).color('#F0F0F0').margin({ left: 56 })
+
+            // Settings
+            // TODO: Navigate to Settings page (notifications, language, account preferences)
+            Row() {
+              SymbolGlyph($r('sys.symbol.gearshape'))
+                .fontSize(20)
+                .fontColor(['#555555'])
+                .margin({ right: 16 })
+              Text('Settings')
+                .fontSize(16)
+                .fontColor('#1A1A1A')
+                .layoutWeight(1)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(14)
+                .fontColor(['#C0C0C0'])
+            }
+            .width('100%')
+            .height(56)
+            .padding({ left: 20, right: 20 })
+
+            Divider().strokeWidth(0.5).color('#F0F0F0').margin({ left: 56 })
+
+            // Help & Support
+            // TODO: Navigate to Help & Support page (FAQ, contact, documentation)
+            Row() {
+              SymbolGlyph($r('sys.symbol.questionmark_circle'))
+                .fontSize(20)
+                .fontColor(['#555555'])
+                .margin({ right: 16 })
+              Text('Help & Support')
+                .fontSize(16)
+                .fontColor('#1A1A1A')
+                .layoutWeight(1)
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(14)
+                .fontColor(['#C0C0C0'])
+            }
+            .width('100%')
+            .height(56)
+            .padding({ left: 20, right: 20 })
+          }
+          .width('100%')
+          .backgroundColor(Color.White)
+          .borderRadius(16)
+
+          // Log Out
+          Row() {
+            SymbolGlyph($r('sys.symbol.power'))
+              .fontSize(20)
+              .fontColor(['#FF3B30'])
+              .margin({ right: 16 })
+            Text('Log Out')
+              .fontSize(16)
+              .fontColor('#FF3B30')
+              .layoutWeight(1)
+          }
+          .width('100%')
+          .height(56)
+          .padding({ left: 20, right: 20 })
+          .backgroundColor(Color.White)
+          .borderRadius(16)
+          .onClick(() => {
+            this.handleLogout();
+          })
+        }
+        .width('100%')
+        .padding({ left: 16, right: 16, top: 16, bottom: 32 })
+      }
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')
-    .backgroundColor($r('sys.color.background_primary'))
-    .padding({ left: 24, right: 24 })
+    .backgroundColor('#F2F4F7')
   }
 
-  /**
-   * Login form
-   */
-  @Builder
-  LoginForm() {
-    Column({ space: 16 }) {
-      // Username input
-      Column({ space: 8 }) {
-        Text('Username')
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor($r('sys.color.font_secondary'))
-          .width('100%')
-
-        TextInput({ placeholder: 'username', text: this.username })
-          .width('100%')
-          .height(48)
-          .borderRadius(12)
-          .backgroundColor($r('sys.color.comp_background_list_card'))
-          .onChange((value) => {
-            this.username = value;
-            this.errorMessage = '';
-          })
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start)
-
-      // Password input
-      Column({ space: 8 }) {
-        Text('Password')
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor($r('sys.color.font_secondary'))
-          .width('100%')
-
-        Row() {
-          TextInput({ placeholder: 'Password', text: this.password })
-            .width('100%')
-            .height(48)
-            .borderRadius(12)
-            .type(this.showPassword ? InputType.Normal : InputType.Password)
-            .backgroundColor($r('sys.color.comp_background_list_card'))
-            .onChange((value) => {
-              this.password = value;
-              this.errorMessage = '';
-            })
-
-          // Show/hide password button
-          // Button({ type: ButtonType.Circle }) {
-          //   SymbolGlyph(this.showPassword ? $r('sys.symbol.eye_slash') : $r('sys.symbol.eye'))
-          //     .fontSize(20)
-          //     .fontColor([$r('sys.color.icon_secondary')])
-          // }
-          // .width(40)
-          // .height(40)
-          // .backgroundColor(Color.Transparent)
-          // .margin({ left: -48 })
-          // .onClick(() => {
-          //   this.showPassword = !this.showPassword;
-          // })
-        }
-        .width('100%')
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start)
-
-      // Error message
-      if (this.errorMessage) {
-        Text(this.errorMessage)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor(Color.Red)
-          .width('100%')
-          .margin({ top: 4 })
-      }
-
-      // Login button
-      Button(this.isLoading ? 'Logging in...' : 'Log In')
-        .width('100%')
-        .height(48)
-        .borderRadius(24)
-        .backgroundColor($r('sys.color.icon_emphasize'))
-        .fontColor(Color.White)
-        .fontSize($r('sys.float.Subtitle_M'))
-        .fontWeight(FontWeight.Medium)
-        .enabled(!this.isLoading && this.username.length > 0 && this.password.length > 0)
-        .margin({ top: 16 })
-        .onClick(() => {
-          this.handleLogin();
-        })
-
-      // Register link
-      Row() {
-        Text('No account? ')
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor($r('sys.color.font_secondary'))
-
-        Text('Create an account')
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor($r('sys.color.font_emphasize'))
-          .onClick(() => {
-            const nav = AppStorage.get<NavPathStack>('navPathStack');
-            if (nav) {
-              nav.pushPathByName('Register', null);
-            }
-          })
-      }
-      .margin({ top: 16 })
-    }
-    .width('100%')
-    .margin({ top: 32 })
-  }
-
-  /**
-   * Logged in view
-   */
-  @Builder
-  LoggedInView() {
-    Column({ space: 16 }) {
-      // Avatar
-      Circle({ width: 80, height: 80 })
-        .fill($r('sys.color.icon_secondary'))
-
-      // Username
-      Text(this.username)
-        .fontSize($r('sys.float.Title_M'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
-
-      // Welcome message
-      Text('Welcome!')
-        .fontSize($r('sys.float.Body_M'))
-        .fontColor($r('sys.color.font_secondary'))
-
-      // Logout button
-      Button('Logout')
-        .width('100%')
-        .height(48)
-        .borderRadius(24)
-        .backgroundColor($r('sys.color.comp_background_list_card'))
-        .fontColor($r('sys.color.font_primary'))
-        .fontSize($r('sys.float.Subtitle_M'))
-        .fontWeight(FontWeight.Medium)
-        .margin({ top: 32 })
-        .onClick(() => {
-          this.handleLogout();
-        })
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Center)
-    .margin({ top: 32 })
-  }
-
-  /**
-   * Handle login
-   */
-  private handleLogin(): void {
-    if (this.username.length === 0) {
-      this.errorMessage = 'Please enter your username';
-      return;
-    }
-    if (this.password.length === 0) {
-      this.errorMessage = 'Please enter your password';
-      return;
-    }
-
-    this.isLoading = true;
-    // [V2-TODO] Replace local mock with V2 auth API:
-    //   POST /auth/login {username, password} → {token, userId}
-    //   Store token and userId in AppStorage for S2 to use.
-    setTimeout(() => {
-      this.isLoading = false;
-      // Local mock: non-empty username and password = login success
-      if (this.username.length >= 3 && this.password.length >= 6) {
-        this.isLoggedIn = true;
-        AppStorage.setOrCreate<boolean>('isLoggedIn', true);
-        AppStorage.setOrCreate<string>('registeredUser', this.username);
-        this.errorMessage = '';
-        // Persist to disk so session survives app restarts
-        AuthService.getInstance().saveSession(this.username);
-      } else {
-        this.errorMessage = 'Username needs 3+ chars, Password needs 6+ chars';
-      }
-    }, 1000);
-  }
-
-  /**
-   * Handle logout
-   */
   private handleLogout(): void {
-    this.isLoggedIn = false;
     AppStorage.setOrCreate<boolean>('isLoggedIn', false);
-    this.username = '';
-    this.password = '';
-    this.errorMessage = '';
-    // Erase from disk so next app launch starts unauthenticated
+    AppStorage.setOrCreate<string>('authToken', '');
+    AppStorage.setOrCreate<number>('userId', 0);
+    AppStorage.setOrCreate<string>('userName', '');
+    AppStorage.setOrCreate<string>('userEmail', '');
+    AppStorage.setOrCreate<number>('userAge', 0);
+    AppStorage.setOrCreate<string>('registeredUser', '');
     AuthService.getInstance().clearSession();
   }
 }

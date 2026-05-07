@@ -7,6 +7,7 @@ import { HomePage } from './HomePage';
 import { TestPage } from './TestPage';
 import { RecordPage } from './RecordPage';
 import { ProfilePage } from './ProfilePage';
+import { LoginPage } from './LoginPage';
 import { SensorConnectionPage } from './rehabilitation/SensorConnectionPage';
 import { SessionSetupPage } from './rehabilitation/SessionSetupPage';
 import { SessionActivePage } from './rehabilitation/SessionActivePage';
@@ -24,6 +25,8 @@ struct Index {
   onLoginStateChange(propName: string): void {
     if (!this.isLoggedIn) {
       this.currentIndex = 3;
+    } else {
+      this.currentIndex = 0;
     }
   }
 
@@ -52,7 +55,11 @@ struct Index {
         .tabBar(this.TabBuilder(2))
 
         TabContent() {
-            ProfilePage();
+          if (this.isLoggedIn) {
+            ProfilePage()
+          } else {
+            LoginPage()
+          }
         }
         .tabBar(this.TabBuilder(3))
       }

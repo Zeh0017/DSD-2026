@@ -1,6 +1,8 @@
 /**
  * Test page - Rehab training entry
  */
+import { LIMBS_TEAL } from '../designtoken/Color';
+
 @ComponentV2
 export struct TestPage {
   private navStack: NavPathStack = AppStorage.get<NavPathStack>('navPathStack') as NavPathStack;
@@ -28,7 +30,7 @@ export struct TestPage {
           Row({ space: 12 }) {
             SymbolGlyph($r('sys.symbol.heart_circle_fill'))
               .fontSize(32)
-              .fontColor([$r('sys.color.icon_emphasize')])
+              .fontColor([LIMBS_TEAL])
 
             Column({ space: 4 }) {
               Text('Start Training')
@@ -49,7 +51,7 @@ export struct TestPage {
             .width('100%')
             .height(48)
             .borderRadius(24)
-            .backgroundColor($r('sys.color.icon_emphasize'))
+            .backgroundColor(LIMBS_TEAL)
             .fontColor(Color.White)
             .fontSize($r('sys.float.Subtitle_M'))
             .fontWeight(FontWeight.Medium)

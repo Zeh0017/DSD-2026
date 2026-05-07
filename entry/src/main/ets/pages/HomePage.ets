@@ -3,21 +3,40 @@
  */
 import { LocalStorageService } from '../service/LocalStorageService';
 import { SessionData } from '../service/RehabilitationService';
+import { LIMBS_TEAL } from '../designtoken/Color';
 
-const BLUE: string = '#3A5BDB';
-const BG: string = '#EEF1FB';
+const BG: string = '#EEF9F6';
 const TEXT_PRIMARY: string = '#1A1A2E';
 const TEXT_SECONDARY: string = '#8A8FA8';
 const CARD_BG: string = '#FFFFFF';
-const ICON_BG: string = '#E8EDFF';
+const ICON_BG: string = '#DCF5EF';
 
 @ComponentV2
 export struct HomePage {
   @Local username: string = '';
   @Local latestSession: SessionData | null = null;
   @Local hasSession: boolean = false;
+  @Local selectedPainLevel: number = -1;
 
   private localStorage: LocalStorageService = LocalStorageService.getInstance();
+  private painLevels: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+  private getPainColor(level: number): string {
+    if (level <= 2) return '#4CAF50';
+    if (level <= 4) return '#8BC34A';
+    if (level <= 6) return '#FFC107';
+    if (level <= 8) return '#FF9800';
+    return '#F44336';
+  }
+
+  private getPainLabel(level: number): string {
+    if (level === 0) return 'No Pain';
+    if (level <= 2) return 'Mild';
+    if (level <= 4) return 'Moderate';
+    if (level <= 6) return 'Significant';
+    if (level <= 8) return 'Severe';
+    return 'Worst Pain';
+  }
 
   aboutToAppear(): void {
     this.username = AppStorage.get<string>('registeredUser') ?? 'Patient';
@@ -64,13 +83,10 @@ export struct HomePage {
         Row() {
           // Logo
           Row({ space: 10 }) {
-            Stack({ alignContent: Alignment.Center }) {
-              Circle({ width: 46, height: 46 })
-                .fill(BLUE)
-              SymbolGlyph($r('sys.symbol.person'))
-                .fontSize(22)
-                .fontColor([Color.White])
-            }
+            Image($r('app.media.app_icon'))
+              .width(46)
+              .height(46)
+              .borderRadius(12)
 
             Column({ space: 1 }) {
               Text('LIMBS')
@@ -123,7 +139,7 @@ export struct HomePage {
               .fill(ICON_BG)
             SymbolGlyph($r('sys.symbol.heart_circle_fill'))
               .fontSize(26)
-              .fontColor([BLUE])
+              .fontColor([LIMBS_TEAL])
           }
 
           Column({ space: 5 }) {
@@ -143,7 +159,7 @@ export struct HomePage {
               .fill(ICON_BG)
             SymbolGlyph($r('sys.symbol.chevron_right'))
               .fontSize(16)
-              .fontColor([BLUE])
+              .fontColor([LIMBS_TEAL])
           }
         }
         .width('100%')
@@ -180,7 +196,7 @@ export struct HomePage {
               Row()
                 .width('75%')
                 .height(4)
-                .backgroundColor(BLUE)
+                .backgroundColor(LIMBS_TEAL)
                 .borderRadius(2)
             }
             .width('100%')
@@ -221,7 +237,7 @@ export struct HomePage {
           .layoutWeight(1)
           .padding({ left: 18, right: 18, top: 18, bottom: 18 })
           .borderRadius(20)
-          .backgroundColor(BLUE)
+          .backgroundColor(LIMBS_TEAL)
           .shadow({ radius: 12, color: 'rgba(58,91,219,0.2)', offsetX: 0, offsetY: 4 })
         }
         .width('100%')
@@ -292,7 +308,7 @@ export struct HomePage {
               Column({ space: 2 }) {
                 SymbolGlyph($r('sys.symbol.calendar'))
                   .fontSize(18)
-                  .fontColor([BLUE])
+                  .fontColor([LIMBS_TEAL])
                 Text('25')
                   .fontSize(18)
                   .fontWeight(FontWeight.Bold)
@@ -322,7 +338,7 @@ export struct HomePage {
                     .fontColor(TEXT_SECONDARY)
                   Text('In Clinic')
                     .fontSize(13)
-                    .fontColor(BLUE)
+                    .fontColor(LIMBS_TEAL)
                     .fontWeight(FontWeight.Medium)
                 }
               }
@@ -331,7 +347,7 @@ export struct HomePage {
 
               Text('View >')
                 .fontSize(14)
-                .fontColor(BLUE)
+                .fontColor(LIMBS_TEAL)
                 .fontWeight(FontWeight.Medium)
             }
             .width('100%')
@@ -343,6 +359,9 @@ export struct HomePage {
           .shadow({ radius: 12, color: 'rgba(58,91,219,0.08)', offsetX: 0, offsetY: 4 })
         }
 
+        // ── Pain Check In ────────────────────────────────────────
+        this.PainCheckInCard()
+
       }
       .width('100%')
       .padding({ left: 24, right: 24, bottom: 36 })
@@ -350,5 +369,74 @@ export struct HomePage {
     .width('100%')
     .height('100%')
     .backgroundColor(BG)
+  }
+
+  @Builder
+  PainCheckInCard() {
+    Column({ space: 14 }) {
+      // Header
+      Column({ space: 3 }) {
+        Text('Pain Check In')
+          .fontSize(16)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(TEXT_PRIMARY)
+        Text('How is your pain level today?')
+          .fontSize(13)
+          .fontColor(TEXT_SECONDARY)
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+
+      // Scale 0–10
+      Row() {
+        ForEach(this.painLevels, (level: number) => {
+          Column() {
+            Stack({ alignContent: Alignment.Center }) {
+              Circle()
+                .width(26)
+                .height(26)
+                .fill(this.selectedPainLevel === level ? this.getPainColor(level) : '#F0F2F5')
+              Text(level.toString())
+                .fontSize(10)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(this.selectedPainLevel === level ? Color.White : TEXT_SECONDARY)
+            }
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Center)
+          .onClick(() => {
+            this.selectedPainLevel = level;
+          })
+        }, (level: number) => level.toString())
+      }
+      .width('100%')
+
+      // Min / Max labels
+      Row() {
+        Text('No Pain')
+          .fontSize(11)
+          .fontColor(TEXT_SECONDARY)
+        Blank()
+        Text('Worst Pain')
+          .fontSize(11)
+          .fontColor(TEXT_SECONDARY)
+      }
+      .width('100%')
+
+      // Selected feedback
+      if (this.selectedPainLevel >= 0) {
+        Text(`Level ${this.selectedPainLevel} — ${this.getPainLabel(this.selectedPainLevel)}`)
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.getPainColor(this.selectedPainLevel))
+          .width('100%')
+          .textAlign(TextAlign.Center)
+      }
+    }
+    .width('100%')
+    .padding(20)
+    .borderRadius(20)
+    .backgroundColor(CARD_BG)
+    .shadow({ radius: 12, color: 'rgba(61,201,167,0.08)', offsetX: 0, offsetY: 4 })
   }
 }

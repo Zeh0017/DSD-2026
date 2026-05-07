@@ -1,36 +1,14 @@
-/**
- * AuthService — Persistent session management.
- *
- * WHY THIS EXISTS:
- *   AppStorage is in-memory only and is wiped on every app restart. Without this
- *   service, the user is forced to log in every time the app is opened.
- *
- * HOW IT WORKS:
- *   Login state (isLoggedIn, username) is written to @ohos.data.preferences,
- *   which survives app restarts. On each launch, EntryAbility calls init()
- *   before loading the UI, so AppStorage is already populated with the correct
- *   session state when the first page renders.
- *
- * LIFECYCLE:
- *   1. EntryAbility.onWindowStageCreate  → AuthService.init(context)
- *      Reads persisted state and writes it into AppStorage.
- *   2. ProfilePage.handleLogin           → AuthService.saveSession(username)
- *      Writes the new session to disk after a successful login.
- *   3. ProfilePage.handleLogout          → AuthService.clearSession()
- *      Removes the session from disk so the next launch starts unauthenticated.
- *
- * EXTENSION POINT:
- *   When V2 authentication is implemented, replace the boolean isLoggedIn flag
- *   with a JWT token and expiry timestamp. Add a isTokenExpired() check inside
- *   init() to invalidate sessions that have exceeded the server's TTL.
- */
 import { preferences } from '@kit.ArkData';
 import { Logger } from './FileLoggerService';
 
 const TAG = 'AuthService';
 const PREFS_NAME = 'auth_session';
 const KEY_LOGGED_IN = 'isLoggedIn';
-const KEY_USERNAME = 'username';
+const KEY_TOKEN = 'token';
+const KEY_USER_ID = 'userId';
+const KEY_NAME = 'name';
+const KEY_EMAIL = 'email';
+const KEY_AGE = 'age';
 
 export class AuthService {
   private static instance: AuthService | null = null;
@@ -47,20 +25,26 @@ export class AuthService {
 
   /**
    * Restore session from disk into AppStorage.
-   * Must be awaited in EntryAbility.onWindowStageCreate BEFORE loadContent()
-   * so the UI receives the correct login state on first render.
+   * Must be awaited in EntryAbility.onWindowStageCreate BEFORE loadContent().
    */
   async init(context: Context): Promise<void> {
     try {
       this.prefs = await preferences.getPreferences(context, PREFS_NAME);
       const isLoggedIn = await this.prefs.get(KEY_LOGGED_IN, false) as boolean;
-      const username = await this.prefs.get(KEY_USERNAME, '') as string;
+      const token = await this.prefs.get(KEY_TOKEN, '') as string;
+      const userId = await this.prefs.get(KEY_USER_ID, 0) as number;
+      const name = await this.prefs.get(KEY_NAME, '') as string;
+      const email = await this.prefs.get(KEY_EMAIL, '') as string;
+      const age = await this.prefs.get(KEY_AGE, 0) as number;
 
       AppStorage.setOrCreate<boolean>('isLoggedIn', isLoggedIn);
-      if (isLoggedIn && username.length > 0) {
-        AppStorage.setOrCreate<string>('registeredUser', username);
-      }
-      Logger.info(TAG, `Session restored — loggedIn=${isLoggedIn}, user=${username}`);
+      AppStorage.setOrCreate<string>('authToken', token);
+      AppStorage.setOrCreate<number>('userId', userId);
+      AppStorage.setOrCreate<string>('userName', name);
+      AppStorage.setOrCreate<string>('userEmail', email);
+      AppStorage.setOrCreate<number>('userAge', age);
+      AppStorage.setOrCreate<string>('registeredUser', name);
+      Logger.info(TAG, `Session restored — loggedIn=${isLoggedIn}, user=${name}`);
     } catch (error) {
       Logger.error(TAG, `Failed to restore session: ${String(error)}`);
       AppStorage.setOrCreate<boolean>('isLoggedIn', false);
@@ -68,19 +52,28 @@ export class AuthService {
   }
 
   /**
-   * Persist a successful login to disk.
-   * Call immediately after the user authenticates.
+   * Persist a successful login to disk and AppStorage.
    */
-  async saveSession(username: string): Promise<void> {
+  async saveSession(token: string, userId: number, name: string, email: string, age: number): Promise<void> {
     if (!this.prefs) {
       Logger.warn(TAG, 'Preferences not ready, session not persisted');
       return;
     }
     try {
       await this.prefs.put(KEY_LOGGED_IN, true);
-      await this.prefs.put(KEY_USERNAME, username);
+      await this.prefs.put(KEY_TOKEN, token);
+      await this.prefs.put(KEY_USER_ID, userId);
+      await this.prefs.put(KEY_NAME, name);
+      await this.prefs.put(KEY_EMAIL, email);
+      await this.prefs.put(KEY_AGE, age);
       await this.prefs.flush();
-      Logger.info(TAG, `Session saved for user: ${username}`);
+      AppStorage.setOrCreate<string>('authToken', token);
+      AppStorage.setOrCreate<number>('userId', userId);
+      AppStorage.setOrCreate<string>('userName', name);
+      AppStorage.setOrCreate<string>('userEmail', email);
+      AppStorage.setOrCreate<number>('userAge', age);
+      AppStorage.setOrCreate<string>('registeredUser', name);
+      Logger.info(TAG, `Session saved for user: ${name}`);
     } catch (error) {
       Logger.error(TAG, `Failed to save session: ${String(error)}`);
     }
@@ -88,7 +81,6 @@ export class AuthService {
 
   /**
    * Erase the persisted session from disk.
-   * Call on explicit logout so the next app launch starts unauthenticated.
    */
   async clearSession(): Promise<void> {
     if (!this.prefs) {
@@ -96,7 +88,10 @@ export class AuthService {
     }
     try {
       await this.prefs.put(KEY_LOGGED_IN, false);
-      await this.prefs.put(KEY_USERNAME, '');
+      await this.prefs.put(KEY_TOKEN, '');
+      await this.prefs.put(KEY_USER_ID, 0);
+      await this.prefs.put(KEY_NAME, '');
+      await this.prefs.put(KEY_EMAIL, '');
       await this.prefs.flush();
       Logger.info(TAG, 'Session cleared');
     } catch (error) {
